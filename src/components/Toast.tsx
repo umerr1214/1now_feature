@@ -16,7 +16,7 @@ export function Toast({ message, onDismiss }: ToastProps) {
 
   return (
     <div className="fixed bottom-4 right-4 z-50">
-      <div className="bg-gray-900 text-white px-4 py-3 rounded-lg shadow-lg max-w-sm">
+      <div className="bg-brand-card border border-brand-border text-brand-text-primary px-4 py-3 rounded-lg shadow-lg max-w-sm">
         <p className="text-sm">{message}</p>
       </div>
     </div>

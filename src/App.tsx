@@ -73,7 +73,7 @@ function App() {
   );
 
   return (
-    <div className="min-h-screen bg-brand-surface">
+    <div className="min-h-screen bg-brand-primary">
       <Header
         windowDays={windowDays}
         alertThreshold={alertThreshold}
@@ -88,25 +88,25 @@ function App() {
         {visibleReport.length === 0 ? (
           <div className="text-center py-12">
             <div className="max-w-md mx-auto">
-              <div className="text-gray-400 mb-4">
+              <div className="text-brand-text-muted mb-4">
                 <svg className="mx-auto h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               </div>
-              <h3 className="text-lg font-medium text-gray-900 mb-2">Your fleet is fully working</h3>
-              <p className="text-gray-600">All vehicles have been dismissed or are performing well.</p>
+              <h3 className="text-lg font-medium text-brand-text-primary mb-2">Your fleet is fully working</h3>
+              <p className="text-brand-text-secondary">All vehicles have been dismissed or are performing well.</p>
             </div>
           </div>
         ) : !hasAlerts ? (
           <div className="text-center py-12">
             <div className="max-w-md mx-auto">
-              <div className="text-green-400 mb-4">
+              <div className="text-brand-success mb-4">
                 <svg className="mx-auto h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               </div>
-              <h3 className="text-lg font-medium text-gray-900 mb-2">Fleet is healthy</h3>
-              <p className="text-gray-600">No vehicles need immediate attention.</p>
+              <h3 className="text-lg font-medium text-brand-text-primary mb-2">Fleet is healthy</h3>
+              <p className="text-brand-text-secondary">No vehicles need immediate attention.</p>
             </div>
           </div>
         ) : (

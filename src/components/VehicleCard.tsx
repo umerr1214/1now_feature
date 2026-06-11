@@ -14,23 +14,23 @@ const statusConfig: Record<SuggestionStatus, {
 }> = {
   'idle-critical': {
     badgeText: 'Idle alert',
-    badgeClasses: 'bg-red-50 text-red-700',
-    progressColor: 'bg-red-500'
+    badgeClasses: 'bg-brand-danger/20 text-brand-danger border border-brand-danger/30',
+    progressColor: 'bg-brand-danger'
   },
   'idle-warning': {
     badgeText: 'Idle alert',
-    badgeClasses: 'bg-amber-50 text-amber-700',
-    progressColor: 'bg-amber-500'
+    badgeClasses: 'bg-brand-warning/20 text-brand-warning border border-brand-warning/30',
+    progressColor: 'bg-brand-warning'
   },
   'high-demand': {
     badgeText: 'High demand',
-    badgeClasses: 'bg-green-50 text-green-700',
-    progressColor: 'bg-brand-accent'
+    badgeClasses: 'bg-brand-success/20 text-brand-success border border-brand-success/30',
+    progressColor: 'bg-brand-success'
   },
   'healthy': {
     badgeText: 'Healthy',
-    badgeClasses: 'bg-gray-100 text-gray-600',
-    progressColor: 'bg-brand-primary'
+    badgeClasses: 'bg-brand-text-muted/20 text-brand-text-secondary border border-brand-border',
+    progressColor: 'bg-brand-accent'
   }
 };
 
@@ -47,17 +47,17 @@ export function VehicleCard({ stats, onApplyDiscount, onDismiss, overrideRate }:
   const showActions = isAlertState && !overrideRate;
 
   return (
-    <div className="bg-white rounded-lg border border-brand-border p-6">
+    <div className="bg-brand-card rounded-lg border border-brand-border p-6">
       {/* Header */}
       <div className="flex items-start justify-between mb-4">
         <div className="flex items-center gap-3">
           {/* Color swatch */}
-          <div 
+          <div
             className="w-4 h-4 rounded-full flex-shrink-0"
             style={{ backgroundColor: vehicle.imageColor }}
           />
           <div>
-            <h3 className="font-medium text-brand-primary">
+            <h3 className="font-medium text-brand-text-primary">
               {vehicle.make} {vehicle.model} {vehicle.year} · {vehicle.plate}
             </h3>
           </div>
@@ -70,16 +70,16 @@ export function VehicleCard({ stats, onApplyDiscount, onDismiss, overrideRate }:
       </div>
 
       {/* Stats line */}
-      <div className="text-sm text-gray-600 mb-3">
-        {idleStreak.onTripNow ? 'On trip now' : `Idle ${idleStreak.idleDays} days`} · 
-        ADR ${adr} · 
+      <div className="text-sm text-brand-text-secondary mb-3">
+        {idleStreak.onTripNow ? 'On trip now' : `Idle ${idleStreak.idleDays} days`} ·
+        ADR ${adr} ·
         Util {Math.round(utilization * 100)}%
       </div>
 
       {/* Progress bar */}
       <div className="mb-4">
-        <div className="w-full bg-gray-200 rounded-full h-2">
-          <div 
+        <div className="w-full bg-brand-surface rounded-full h-2">
+          <div
             className={`h-2 rounded-full ${config.progressColor}`}
             style={{ width: `${Math.min(utilization * 100, 100)}%` }}
           />
@@ -89,10 +89,10 @@ export function VehicleCard({ stats, onApplyDiscount, onDismiss, overrideRate }:
       {/* Suggestion */}
       {suggestion.message && (
         <div className="mb-4">
-          <p className="text-sm text-gray-700 mb-1">{suggestion.message}</p>
+          <p className="text-sm text-brand-text-primary mb-1">{suggestion.message}</p>
           {suggestion.estimatedRecovery && (
-            <p className="text-sm text-gray-600">
-              Est. recovery: ${suggestion.estimatedRecovery}/mo
+            <p className="text-sm text-brand-text-secondary">
+              Est. recovery: <span className="text-brand-accent font-medium">${suggestion.estimatedRecovery}/mo</span>
             </p>
           )}
         </div>
@@ -101,7 +101,7 @@ export function VehicleCard({ stats, onApplyDiscount, onDismiss, overrideRate }:
       {/* Override rate message */}
       {overrideRate && (
         <div className="mb-4">
-          <p className="text-sm text-green-700 font-medium">
+          <p className="text-sm text-brand-success font-medium">
             Rate updated to ${overrideRate}/day — we'll watch the next 7 days
           </p>
         </div>
@@ -112,13 +112,13 @@ export function VehicleCard({ stats, onApplyDiscount, onDismiss, overrideRate }:
         <div className="flex gap-2">
           <button
             onClick={handleApplyDiscount}
-            className="px-3 py-1.5 bg-brand-primary text-white text-sm font-medium rounded-md hover:bg-opacity-90 transition-colors"
+            className="px-3 py-1.5 bg-brand-accent text-white text-sm font-medium rounded-md hover:bg-brand-accent/90 transition-colors"
           >
             Apply Discount
           </button>
           <button
             onClick={() => onDismiss(vehicle.id)}
-            className="px-3 py-1.5 border border-gray-300 text-gray-700 text-sm font-medium rounded-md hover:bg-gray-50 transition-colors"
+            className="px-3 py-1.5 border border-brand-border text-brand-text-secondary text-sm font-medium rounded-md hover:bg-brand-surface transition-colors"
           >
             Dismiss
           </button>
