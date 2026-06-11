@@ -47,7 +47,12 @@ export function VehicleCard({ stats, onApplyDiscount, onDismiss, overrideRate }:
   const showActions = isAlertState && !overrideRate;
 
   return (
-    <div className="bg-brand-card rounded-lg border border-brand-border p-6">
+    <div className="relative bg-gradient-to-br from-brand-card/90 to-brand-card/60 backdrop-blur-md rounded-2xl border border-brand-border/30 p-6 shadow-2xl hover:shadow-3xl transition-all duration-500 hover:border-brand-accent/50 hover:bg-gradient-to-br hover:from-brand-card/95 hover:to-brand-card/70 group hover:scale-[1.02] hover:shadow-brand-accent/20">
+      {/* Glassy overlay effect */}
+      <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent rounded-2xl pointer-events-none"></div>
+      {/* Orange hover glow */}
+      <div className="absolute inset-0 bg-gradient-to-br from-brand-accent/0 to-brand-accent/0 group-hover:from-brand-accent/10 group-hover:to-brand-accent/5 rounded-2xl transition-all duration-500 pointer-events-none"></div>
+      <div className="relative z-10">
       {/* Header */}
       <div className="flex items-start justify-between mb-4">
         <div className="flex items-center gap-3">
@@ -124,6 +129,7 @@ export function VehicleCard({ stats, onApplyDiscount, onDismiss, overrideRate }:
           </button>
         </div>
       )}
+      </div>
     </div>
   );
 }

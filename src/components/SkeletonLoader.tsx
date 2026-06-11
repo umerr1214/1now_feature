@@ -5,7 +5,7 @@ export function SkeletonLoader() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {[...Array(4)].map((_, i) => (
-            <div key={i} className="bg-brand-card rounded-lg border border-brand-border p-6 animate-pulse">
+            <div key={i} className="bg-brand-card/80 backdrop-blur-sm rounded-xl border border-brand-border/50 p-6 shadow-lg animate-pulse">
               {/* Header */}
               <div className="flex items-start justify-between mb-4">
                 <div className="flex items-center gap-3">
