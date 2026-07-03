@@ -2,7 +2,6 @@ import { useState, useEffect, useMemo } from 'react';
 import { Vehicle, Booking, FleetConfig } from './types';
 import { buildFleetReport } from './lib/fleetStats';
 import { fetchFleetData } from './data/api';
-import { SEED_TODAY } from './data/seed';
 import { Header } from './components/Header';
 import { SummaryRow } from './components/SummaryRow';
 import { VehicleCard } from './components/VehicleCard';
@@ -32,7 +31,7 @@ function App() {
     if (!vehicles || !bookings) return [];
     
     const config: FleetConfig = { windowDays, alertThreshold };
-    return buildFleetReport(vehicles, bookings, config, SEED_TODAY);
+    return buildFleetReport(vehicles, bookings, config, new Date());
   }, [vehicles, bookings, windowDays, alertThreshold]);
 
   // Filter out dismissed vehicles
