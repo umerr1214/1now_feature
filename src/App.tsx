@@ -7,9 +7,12 @@ import { SummaryRow } from './components/SummaryRow';
 import { VehicleCard } from './components/VehicleCard';
 import { SkeletonLoader } from './components/SkeletonLoader';
 import { Toast } from './components/Toast';
+import { Tabs, TabId } from './components/Tabs';
+import { BookingsView } from './components/BookingsView';
 
 function App() {
   // State
+  const [activeTab, setActiveTab] = useState<TabId>('fleet');
   const [windowDays, setWindowDays] = useState<14 | 30 | 60>(30);
   const [alertThreshold, setAlertThreshold] = useState<3 | 5 | 7>(5);
   const [vehicles, setVehicles] = useState<Vehicle[] | null>(null);
@@ -81,47 +84,55 @@ function App() {
         onThresholdChange={handleThresholdChange}
       />
       
-      <SummaryRow stats={visibleReport} />
+      <Tabs activeTab={activeTab} onTabChange={setActiveTab} />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {visibleReport.length === 0 ? (
-          <div className="text-center py-12">
-            <div className="max-w-md mx-auto">
-              <div className="text-brand-text-muted mb-4">
-                <svg className="mx-auto h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
+      {activeTab === 'fleet' ? (
+        <>
+          <SummaryRow stats={visibleReport} />
+
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            {visibleReport.length === 0 ? (
+              <div className="text-center py-12">
+                <div className="max-w-md mx-auto">
+                  <div className="text-brand-text-muted mb-4">
+                    <svg className="mx-auto h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </div>
+                  <h3 className="text-lg font-medium text-brand-text-primary mb-2">Your fleet is fully working</h3>
+                  <p className="text-brand-text-secondary">All vehicles have been dismissed or are performing well.</p>
+                </div>
               </div>
-              <h3 className="text-lg font-medium text-brand-text-primary mb-2">Your fleet is fully working</h3>
-              <p className="text-brand-text-secondary">All vehicles have been dismissed or are performing well.</p>
-            </div>
-          </div>
-        ) : !hasAlerts ? (
-          <div className="text-center py-12">
-            <div className="max-w-md mx-auto">
-              <div className="text-brand-success mb-4">
-                <svg className="mx-auto h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
+            ) : !hasAlerts ? (
+              <div className="text-center py-12">
+                <div className="max-w-md mx-auto">
+                  <div className="text-brand-success mb-4">
+                    <svg className="mx-auto h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </div>
+                  <h3 className="text-lg font-medium text-brand-text-primary mb-2">Fleet is healthy</h3>
+                  <p className="text-brand-text-secondary">No vehicles need immediate attention.</p>
+                </div>
               </div>
-              <h3 className="text-lg font-medium text-brand-text-primary mb-2">Fleet is healthy</h3>
-              <p className="text-brand-text-secondary">No vehicles need immediate attention.</p>
-            </div>
+            ) : (
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {visibleReport.map((stats) => (
+                  <VehicleCard
+                    key={stats.vehicle.id}
+                    stats={stats}
+                    onApplyDiscount={handleApplyDiscount}
+                    onDismiss={handleDismiss}
+                    overrideRate={overrideRates[stats.vehicle.id]}
+                  />
+                ))}
+              </div>
+            )}
           </div>
-        ) : (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {visibleReport.map((stats) => (
-              <VehicleCard
-                key={stats.vehicle.id}
-                stats={stats}
-                onApplyDiscount={handleApplyDiscount}
-                onDismiss={handleDismiss}
-                overrideRate={overrideRates[stats.vehicle.id]}
-              />
-            ))}
-          </div>
-        )}
-      </div>
+        </>
+      ) : (
+        <BookingsView vehicles={vehicles} bookings={bookings} />
+      )}
 
       {toast && (
         <Toast message={toast.message} onDismiss={handleToastDismiss} />
