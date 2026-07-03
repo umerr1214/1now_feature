@@ -12,7 +12,8 @@ const mockIdleCriticalStats: VehicleStats = {
     plate: 'ABC123',
     listedDailyRate: 85,
     addedDate: '2024-07-01',
-    imageColor: '#ef4444'
+    imageColor: '#ef4444',
+    utilization: 0.3
   },
   utilization: 0.3,
   idleStreak: { idleDays: 12, nextBookingInDays: null, onTripNow: false },
@@ -35,7 +36,8 @@ const mockHighDemandStats: VehicleStats = {
     plate: 'GHI789',
     listedDailyRate: 120,
     addedDate: '2024-05-01',
-    imageColor: '#10b981'
+    imageColor: '#10b981',
+    utilization: 0.88
   },
   utilization: 0.88,
   idleStreak: { idleDays: 0, nextBookingInDays: null, onTripNow: true },
@@ -58,7 +60,8 @@ const mockHealthyStats: VehicleStats = {
     plate: 'VWX234',
     listedDailyRate: 115,
     addedDate: '2024-05-15',
-    imageColor: '#84cc16'
+    imageColor: '#84cc16',
+    utilization: 0.65
   },
   utilization: 0.65,
   idleStreak: { idleDays: 3, nextBookingInDays: null, onTripNow: false },

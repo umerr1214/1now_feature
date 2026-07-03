@@ -12,6 +12,7 @@ class Vehicle(BaseModel):
     listedDailyRate: float
     addedDate: str
     imageColor: Optional[str] = None
+    utilization: float
 
 
 class Booking(BaseModel):

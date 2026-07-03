@@ -64,17 +64,6 @@ export function getEffectiveWindow(vehicle: Vehicle, windowDays: number, today: 
   return Math.max(1, Math.min(windowDays, daysInFleet));
 }
 
-export function getUtilization(
-  vehicle: Vehicle, 
-  bookings: Booking[], 
-  windowDays: number, 
-  today: Date
-): number {
-  const bookedDays = getBookedDays(vehicle, bookings, windowDays, today).size;
-  const effectiveWindow = getEffectiveWindow(vehicle, windowDays, today);
-  return bookedDays / effectiveWindow;
-}
-
 export function getIdleStreak(vehicle: Vehicle, bookings: Booking[], today: Date): IdleStreakResult {
   const vehicleBookings = bookings.filter(b => b.vehicleId === vehicle.id);
   
@@ -223,7 +212,7 @@ export function buildFleetReport(
   const suggestionEngine = new RuleBasedSuggestionEngine();
   
   const stats = vehicles.map(vehicle => {
-    const utilization = getUtilization(vehicle, bookings, config.windowDays, today);
+    const utilization = vehicle.utilization;
     const idleStreak = getIdleStreak(vehicle, bookings, today);
     const adr = getADR(vehicle, bookings, config.windowDays, today);
     const bookedDays = getBookedDays(vehicle, bookings, config.windowDays, today).size;

@@ -21,7 +21,8 @@ const testVehicle: Vehicle = {
   plate: 'TEST123',
   listedDailyRate: 85,
   addedDate: '2024-07-01',
-  imageColor: '#ef4444'
+  imageColor: '#ef4444',
+  utilization: 0.5
 };
 
 const testBookings: Booking[] = [

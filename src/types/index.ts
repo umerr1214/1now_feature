@@ -7,6 +7,7 @@ export interface Vehicle {
   listedDailyRate: number;   // USD fallback when no booking history
   addedDate: string;          // ISO date
   imageColor?: string;        // hex for avatar color swatch
+  utilization: number;        // 0..1, computed & stored server-side (fixed 30-day window)
 }
 
 export interface Booking {

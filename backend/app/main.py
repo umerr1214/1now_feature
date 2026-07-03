@@ -6,12 +6,14 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.config import settings
 from app.database import get_database
 from app.models import Booking, Vehicle
-from app.seed import seed_if_empty
+from app.seed import backfill_utilization, seed_if_empty
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    await seed_if_empty(get_database())
+    db = get_database()
+    await seed_if_empty(db)
+    await backfill_utilization(db)
     yield
 
 

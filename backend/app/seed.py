@@ -1,6 +1,10 @@
-from datetime import datetime, timedelta, timezone
+from datetime import date, datetime, timedelta, timezone
 
 from motor.motor_asyncio import AsyncIOMotorDatabase
+
+# Utilization is computed once and stored on the vehicle document (not recalculated
+# against the frontend's Analysis Window selector) — a fixed trailing window here.
+UTILIZATION_WINDOW_DAYS = 30
 
 
 def _iso_date(dt: datetime) -> str:
@@ -15,10 +19,48 @@ def _days_ago(now: datetime, days: int) -> datetime:
     return now - timedelta(days=days)
 
 
+def _booked_days(vehicle_id: str, bookings: list[dict], now: datetime, window_days: int) -> set[date]:
+    window_end = now
+    window_start = now - timedelta(days=window_days - 1)
+
+    booked: set[date] = set()
+    for booking in bookings:
+        if booking["vehicleId"] != vehicle_id:
+            continue
+
+        start = datetime.strptime(booking["startDate"], "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=timezone.utc)
+        end = datetime.strptime(booking["endDate"], "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=timezone.utc)
+
+        clipped_start = max(start, window_start)
+        clipped_end = min(end, window_end)
+        if clipped_start > clipped_end:
+            continue
+
+        day = clipped_start.date()
+        while day <= clipped_end.date():
+            booked.add(day)
+            day += timedelta(days=1)
+
+    return booked
+
+
+def _effective_window(added_date: str, now: datetime, window_days: int) -> int:
+    added = datetime.strptime(added_date, "%Y-%m-%d").date()
+    days_in_fleet = (now.date() - added).days + 1
+    return max(1, min(window_days, days_in_fleet))
+
+
+def _compute_utilization(vehicle_id: str, added_date: str, bookings: list[dict], now: datetime) -> float:
+    booked_days = _booked_days(vehicle_id, bookings, now, UTILIZATION_WINDOW_DAYS)
+    effective_window = _effective_window(added_date, now, UTILIZATION_WINDOW_DAYS)
+    return round(len(booked_days) / effective_window, 4)
+
+
 def _build_vehicles(now: datetime) -> list[dict]:
     added = _iso_date(_days_ago(now, 90))
     return [
         {
+            # healthy -> fully utilized
             "make": "Toyota",
             "model": "Camry",
             "year": 2022,
@@ -26,8 +68,10 @@ def _build_vehicles(now: datetime) -> list[dict]:
             "listedDailyRate": 85,
             "addedDate": added,
             "imageColor": "#ef4444",
+            "utilization": 1.0,
         },
         {
+            # healthy -> fully utilized
             "make": "Honda",
             "model": "Civic",
             "year": 2023,
@@ -35,8 +79,10 @@ def _build_vehicles(now: datetime) -> list[dict]:
             "listedDailyRate": 75,
             "addedDate": added,
             "imageColor": "#3b82f6",
+            "utilization": 1.0,
         },
         {
+            # idle-warning -> half utilized
             "make": "Nissan",
             "model": "Altima",
             "year": 2022,
@@ -44,8 +90,10 @@ def _build_vehicles(now: datetime) -> list[dict]:
             "listedDailyRate": 70,
             "addedDate": added,
             "imageColor": "#f59e0b",
+            "utilization": 0.5,
         },
         {
+            # idle-warning -> half utilized
             "make": "Ford",
             "model": "Mustang",
             "year": 2023,
@@ -53,8 +101,10 @@ def _build_vehicles(now: datetime) -> list[dict]:
             "listedDailyRate": 95,
             "addedDate": added,
             "imageColor": "#8b5cf6",
+            "utilization": 0.5,
         },
         {
+            # idle-critical -> not utilized at all
             "make": "BMW",
             "model": "3 Series",
             "year": 2023,
@@ -62,6 +112,7 @@ def _build_vehicles(now: datetime) -> list[dict]:
             "listedDailyRate": 110,
             "addedDate": added,
             "imageColor": "#ec4899",
+            "utilization": 0.0,
         },
     ]
 
@@ -112,3 +163,21 @@ async def seed_if_empty(db: AsyncIOMotorDatabase) -> None:
 
     bookings = _build_bookings(now, vehicle_ids)
     await db.bookings.insert_many(bookings)
+
+
+async def backfill_utilization(db: AsyncIOMotorDatabase) -> None:
+    """Fills in `utilization` for vehicle documents that predate this field.
+
+    Computed once and stored — not recalculated on later startups once present.
+    """
+    stale_vehicles = await db.vehicles.find({"utilization": {"$exists": False}}).to_list(length=None)
+    if not stale_vehicles:
+        return
+
+    now = datetime.now(timezone.utc)
+    bookings = await db.bookings.find().to_list(length=None)
+
+    for vehicle in stale_vehicles:
+        vehicle_id = str(vehicle["_id"])
+        utilization = _compute_utilization(vehicle_id, vehicle["addedDate"], bookings, now)
+        await db.vehicles.update_one({"_id": vehicle["_id"]}, {"$set": {"utilization": utilization}})
